@@ -29,4 +29,5 @@ public class VehicleResponseDTO {
     private String status;
     private Integer branchId;
     private Integer turnaroundMinutes;
+    private String imageUrl;
 }

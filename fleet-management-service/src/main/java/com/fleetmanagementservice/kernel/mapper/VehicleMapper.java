@@ -30,6 +30,7 @@ public final class VehicleMapper {
                 .status(e.getStatus())
                 .branchId(e.getBranchId())
                 .turnaroundMinutes(e.getTurnaroundMinutes())
+                .imageUrl(e.getImageUrl())
                 .build();
     }
 
@@ -59,6 +60,7 @@ public final class VehicleMapper {
                 .status(dto.getStatus())
                 .branchId(dto.getBranchId())
                 .turnaroundMinutes(dto.getTurnaroundMinutes())
+                .imageUrl(dto.getImageUrl())
                 .build();
     }
 

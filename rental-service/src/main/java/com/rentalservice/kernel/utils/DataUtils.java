@@ -79,6 +79,10 @@ public class DataUtils {
                 ? dFloor + 0.5
                 : dFloor + 1.0;
 
+        if (frac == 0) {
+            rounded -= 0.5;
+        }
+
         return (Double.compare(rounded, durationDays) == 0);
     }
 

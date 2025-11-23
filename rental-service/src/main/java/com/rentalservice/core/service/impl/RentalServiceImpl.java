@@ -218,7 +218,7 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public void sync() {
         List<Rental> rentalList = rentalRepository.findAvailableRental(List.of(RentalStatus.RENTING.name(),
-                RentalStatus.HOLD.name()), LocalDateTime.now());
+                RentalStatus.RESERVED.name()), LocalDateTime.now());
 
         for (Rental rental : rentalList) {
             RentalRequestDTO request;

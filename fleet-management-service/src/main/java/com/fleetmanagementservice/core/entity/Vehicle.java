@@ -43,4 +43,6 @@ public class Vehicle {
     private Integer branchId;
     @Column(name = "turnaround_minutes")
     private Integer turnaroundMinutes;
+    @Column(name = "image_url")
+    private String imageUrl;
 }

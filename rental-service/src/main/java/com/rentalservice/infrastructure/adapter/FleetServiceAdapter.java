@@ -2,6 +2,7 @@ package com.rentalservice.infrastructure.adapter;
 
 import com.rentalservice.core.constant.RemoteUrls;
 import com.rentalservice.core.constant.response.GeneralResponse;
+import com.rentalservice.core.context.LocalContextHolder;
 import com.rentalservice.core.dto.request.VehicleBlockRequestDTO;
 import com.rentalservice.core.dto.request.VehicleRequestDTO;
 import com.rentalservice.core.dto.response.VehicleBlockResponseDTO;
@@ -13,7 +14,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
-import java.rmi.Remote;
 import java.time.Duration;
 import java.util.List;
 
@@ -21,11 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FleetServiceAdapter {
 
-    @Value("${client.rental.service}")
+    @Value("${client.fleet.service}")
     private String fleetServiceUrl;
 
     private HttpHeaders headers() {
-        return new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(LocalContextHolder.get().getToken());
+        return headers;
     }
 
     public List<VehicleResponseDTO> getVehicleDetails(VehicleRequestDTO request) {
