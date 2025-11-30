@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@RequestMapping("/rental")
+@RequestMapping("/api/rental")
 public interface RentalController {
     @PostMapping("/create")
     public GeneralResponse<RentalResponseDTO> createRental(@RequestBody RentalCreateRequestDTO request);

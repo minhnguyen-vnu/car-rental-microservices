@@ -9,6 +9,7 @@ import com.rentalservice.core.dto.response.VehicleBlockResponseDTO;
 import com.rentalservice.core.dto.response.VehicleResponseDTO;
 import com.rentalservice.kernel.client.RestClientTemplate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FleetServiceAdapter {
@@ -33,6 +35,7 @@ public class FleetServiceAdapter {
     public List<VehicleResponseDTO> getVehicleDetails(VehicleRequestDTO request) {
         RestClientTemplate restClientTemplate = RestClientTemplate.withTimeouts(Duration.ofSeconds(5), Duration.ofSeconds(5));
         String url = fleetServiceUrl.concat(RemoteUrls.Fleet.GET_VEHICLE_DETAILS);
+        log.info("Sending to {} with request {}", url, request);
         return restClientTemplate.postForList(url, request, headers(), new ParameterizedTypeReference<GeneralResponse<List<VehicleResponseDTO>>>() {});
     }
 

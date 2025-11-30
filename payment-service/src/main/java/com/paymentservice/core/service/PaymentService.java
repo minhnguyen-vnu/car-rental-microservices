@@ -11,6 +11,7 @@ public interface PaymentService {
     PaymentChargeResponseDTO charge(PaymentChargeRequestDTO req);
     PaymentDTO getByCode(String paymentCode);
 
-    void handleVnpReturn(VnpReturnRequestDTO req);
+    String handleVnpReturn(VnpReturnRequestDTO req);
+    void sync(); 
 
 }

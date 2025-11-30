@@ -21,6 +21,7 @@ import com.paymentservice.kernel.mapper.PaymentMapper;
 import com.paymentservice.kernel.utils.DataUtils;
 import com.paymentservice.kernel.utils.VnPaySigner;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,11 +30,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository repo;
     private final VnPayConfig vnp;
     private final PaymentResultProducer producer;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public PaymentChargeResponseDTO charge(PaymentChargeRequestDTO req) {
@@ -63,8 +66,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         p = repo.save(p);
 
+        log.info("created at {}", p.getCreatedAt());
 
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        log.info(now);
         Map<String,String> params = new LinkedHashMap<>();
         params.put("vnp_Version", "2.1.0");
         params.put("vnp_Command", "pay");
@@ -78,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
         params.put("vnp_IpAddr", "127.0.0.1");
         params.put("vnp_ReturnUrl", vnp.getReturnUrl());
         params.put("vnp_CreateDate", now);
-        params.put("vnp_ExpireDate", LocalDateTime.now().plusMinutes(15)
+        params.put("vnp_ExpireDate", p.getCreatedAt().plusMinutes(15)
                 .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 
         try {
@@ -102,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void handleVnpReturn(VnpReturnRequestDTO req) {
+    public String handleVnpReturn(VnpReturnRequestDTO req) {
         Map<String, String> map = new HashMap<>();
         map.put("vnp_TmnCode", req.getVnp_TmnCode());
         map.put("vnp_TxnRef", req.getVnp_TxnRef());
@@ -120,23 +125,16 @@ public class PaymentServiceImpl implements PaymentService {
         map.put("vnp_SecureHashType", req.getVnp_SecureHashType());
         map.put("vnp_SecureHash", req.getVnp_SecureHash());
 
-        if (!VnPaySigner.verify(map, vnp.getHashSecret()))
-            throw new AppException(ErrorCode.PAYMENT_SIGNATURE_INVALID);
 
-        if (!Objects.equals(req.getVnp_TmnCode(), vnp.getTmnCode()))
-            throw new AppException(ErrorCode.PAYMENT_TMN_INVALID);
-
-        Payment p = repo.findByPaymentCode(req.getVnp_TxnRef())
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-
-        long vnpAmount = Long.parseLong(req.getVnp_Amount());
-        long localAmount = p.getAmount().multiply(BigDecimal.valueOf(100)).longValue();
-        if (vnpAmount != localAmount)
-            throw new AppException(ErrorCode.PAYMENT_AMOUNT_MISMATCH);
+        Optional<Payment> optPayment = repo.findByPaymentCode(req.getVnp_TxnRef());
+        if (optPayment.isEmpty()) {
+            return "redirect:http://alb-public-541884615.ap-southeast-2.elb.amazonaws.com/#/payment-fail";
+        }
+        Payment p = optPayment.get();
 
         if (PaymentStatus.STATUS_SUCCEEDED.getStatus().equalsIgnoreCase(p.getStatus())
                 || PaymentStatus.STATUS_FAILED.getStatus().equalsIgnoreCase(p.getStatus())) {
-            throw new AppException(ErrorCode.PAYMENT_STATUS_FINALIZED);
+            return "redirect:http://alb-public-541884615.ap-southeast-2.elb.amazonaws.com/#/payment-fail";
         }
 
         if (VnPayPaymentStatus.SUCCESS.getCode().equals(req.getVnp_ResponseCode())) {
@@ -161,12 +159,38 @@ public class PaymentServiceImpl implements PaymentService {
                     .rentalId(Integer.valueOf(req.getVnp_OrderInfo().substring(7)))
                     .result(PaymentStatus.STATUS_SUCCEEDED.getStatus())
                     .build();
+
+            producer.sendPaymentResult(paymentResultEvent);
+            return "redirect:http://alb-public-541884615.ap-southeast-2.elb.amazonaws.com/#/payment-success";
         } else {
             paymentResultEvent = PaymentResultEvent.builder()
                     .rentalId(Integer.valueOf(req.getVnp_OrderInfo().substring(7)))
                     .result(PaymentStatus.STATUS_FAILED.getStatus())
                     .build();
+
+            producer.sendPaymentResult(paymentResultEvent);
+            return "redirect:http://alb-public-541884615.ap-southeast-2.elb.amazonaws.com/#/payment-fail";
         }
-        producer.sendPaymentResult(paymentResultEvent);
+    }
+
+    @Override
+    public void sync() {
+        log.info("=== SYNC RUNNING ===");
+        List<Payment> payments = paymentRepository.findDuePayments(LocalDateTime.now().minusMinutes(15));
+        log.info("Found {} due payments at {}", payments.size(), LocalDateTime.now());
+
+        PaymentResultEvent paymentResultEvent;
+        for (Payment payment : payments) {
+            payment.setStatus(PaymentStatus.STATUS_FAILED.getStatus());
+            paymentRepository.save(payment);
+
+            paymentResultEvent = PaymentResultEvent.builder()
+                    .rentalId(payment.getRentalId())
+                    .result(PaymentStatus.STATUS_FAILED.getStatus())
+                    .build();
+            producer.sendPaymentResult(paymentResultEvent);
+
+        }
+
     }
 }

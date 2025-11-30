@@ -44,6 +44,8 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public Rental createRental(RentalCreateRequestDTO request) {
+        log.info("start processing a rental request {}", request);
+
         Integer userId = LocalContextHolder.get().getUserId();
 
         if (DataUtils.isNull(request)) {
@@ -72,7 +74,9 @@ public class RentalServiceImpl implements RentalService {
             throw new AppException(ErrorCode.REQ_INVALID_AMOUNT);
         }
 
+        log.info("Sending request to fleet service");
         List<VehicleResponseDTO> vehicleResponseList = fleetServiceAdapter.getVehicleDetails(FleetMapper.toRequest(request.getVehicleId()));
+        log.info("Fleet Service response {}", vehicleResponseList);
         List<VehicleBlockResponseDTO> vehicleBlockResponseList = fleetServiceAdapter.getVehicleBlocks(VehicleBlockMapper.toRequest(request.getVehicleId(), request.getPickupTime(), request.getReturnTime()));
         boolean overlap = rentalRepository.existsByVehicleIdAndStatusInAndPickupTimeLessThanAndReturnTimeGreaterThan(
                 request.getVehicleId(), List.of(RentalStatus.HOLD.name(), RentalStatus.RESERVED.name(), RentalStatus.RENTING.name()), request.getReturnTime(), request.getPickupTime());

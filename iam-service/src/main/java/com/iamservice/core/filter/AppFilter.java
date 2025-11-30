@@ -38,7 +38,7 @@ public class AppFilter extends OncePerRequestFilter {
     }
 
     private static final Set<String> SKIP_PREFIX = Set.of(
-            "/auth/login", "/auth/register", "/actuator", "/swagger", "/v3/api-docs"
+            "/api/auth/login", "/api/auth/register", "/actuator", "/swagger", "/v3/api-docs"
     );
 
     @Override

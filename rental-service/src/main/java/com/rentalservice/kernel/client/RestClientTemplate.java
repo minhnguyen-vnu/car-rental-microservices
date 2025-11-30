@@ -4,6 +4,7 @@ import com.rentalservice.core.constant.enums.ErrorCode;
 import com.rentalservice.core.constant.exception.AppException;
 import com.rentalservice.core.constant.response.GeneralResponse;
 import com.rentalservice.core.constant.response.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 public class RestClientTemplate {
 
     private final RestTemplate restTemplate;
@@ -73,6 +75,7 @@ public class RestClientTemplate {
             HttpHeaders headers,
             ParameterizedTypeReference<GeneralResponse<List<T>>> responseType
     ) {
+        log.info("exchangeForList {} {} {}", url, body, headers);
         HttpHeaders h = ensureJson(headers);
         HttpEntity<Object> entity = new HttpEntity<>(body, h);
         ResponseEntity<GeneralResponse<List<T>>> resp =
@@ -98,6 +101,7 @@ public class RestClientTemplate {
             HttpHeaders headers,
             ParameterizedTypeReference<GeneralResponse<List<T>>> responseType
     ) {
+        log.info("postForList {} {} {}", url, body, headers);
         return exchangeForList(url, HttpMethod.POST, body, headers, responseType);
     }
 

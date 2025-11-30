@@ -4,11 +4,13 @@ package com.rentalservice.core.constant.exception.handler;
 import com.rentalservice.core.constant.enums.ErrorCode;
 import com.rentalservice.core.constant.exception.AppException;
 import com.rentalservice.core.constant.response.GeneralResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -22,6 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public GeneralResponse<Void> handleOther(Exception ex) {
+        log.info("error from server {} {}", ErrorCode.SYS_UNEXPECTED.getCode(), ErrorCode.SYS_UNEXPECTED.getMessage());
         return GeneralResponse.error(ErrorCode.SYS_UNEXPECTED.getCode(), ErrorCode.SYS_UNEXPECTED.getMessage());
     }
 }

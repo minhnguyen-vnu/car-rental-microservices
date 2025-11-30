@@ -7,7 +7,7 @@ import com.paymentservice.core.response.GeneralResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/payments")
+@RequestMapping("/api/payments")
 public interface PaymentController {
 
     @PostMapping("/charge")

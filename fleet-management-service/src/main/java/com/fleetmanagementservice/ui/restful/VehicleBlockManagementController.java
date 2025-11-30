@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@RequestMapping("/vehicle-blocks")
+@RequestMapping("/api/vehicle-blocks")
 public interface VehicleBlockManagementController {
     @PostMapping("/get")
     public GeneralResponse<List<VehicleBlockResponseDTO>> getVehicleBlock(@RequestBody VehicleBlockRequestDTO request);

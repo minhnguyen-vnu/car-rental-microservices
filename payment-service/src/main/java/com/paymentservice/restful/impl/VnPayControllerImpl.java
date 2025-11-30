@@ -6,17 +6,20 @@ import com.paymentservice.core.dto.response.VnpReturnViewDTO;
 import com.paymentservice.core.response.GeneralResponse;
 import com.paymentservice.core.service.PaymentService;
 import com.paymentservice.restful.VnPayController;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+import java.io.IOException;
+
+@Controller
 @RequiredArgsConstructor
 public class VnPayControllerImpl implements VnPayController {
     private final PaymentService paymentService;
 
     @Override
-    public GeneralResponse<Void> vnpReturn(VnpReturnRequestDTO req) {
-        paymentService.handleVnpReturn(req);
-        return GeneralResponse.ok(null);
+    public String vnpReturn(VnpReturnRequestDTO req) {
+        return paymentService.handleVnpReturn(req);
     }
 }

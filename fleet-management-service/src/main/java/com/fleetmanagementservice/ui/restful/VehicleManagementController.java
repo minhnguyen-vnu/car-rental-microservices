@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/vehicle")
+@RequestMapping("/api/vehicle")
 public interface VehicleManagementController {
     @PostMapping("/add")
     public GeneralResponse<VehicleResponseDTO> addVehicle(@RequestBody VehicleRequestDTO addVehicleRequestDTO);
