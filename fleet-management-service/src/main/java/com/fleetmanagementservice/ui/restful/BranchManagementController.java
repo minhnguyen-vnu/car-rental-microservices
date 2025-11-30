@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/branch")
+@RequestMapping("/api/branch")
 public interface BranchManagementController {
     @PostMapping("/add")
     public GeneralResponse<BranchResponseDTO> addBranch(@RequestBody BranchRequestDTO branchRequestDTO);
