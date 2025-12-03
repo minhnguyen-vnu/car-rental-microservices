@@ -30,6 +30,7 @@ public enum ErrorCode {
     REQ_INVALID_DURATION(2010, "Invalid duration value"),
     REQ_INVALID_AMOUNT(2011, "Invalid amount value"),
     REQ_TIME_RANGE_REQUIRED(2012, "Pickup and Return time required"),
+    REQ_IS_NOT_MEANINGFUL(2013, "Request nonsense"),
 
     // 3xxx: Vehicle
     VEHICLE_NOT_FOUND(3001, "Vehicle not found"),

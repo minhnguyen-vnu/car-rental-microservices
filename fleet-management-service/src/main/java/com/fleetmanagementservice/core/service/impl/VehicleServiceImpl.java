@@ -92,7 +92,9 @@ public class VehicleServiceImpl implements VehicleService {
             throw new AppException(ErrorCode.REQ_INVALID_TIME_RANGE);
         }
 
-
+        if (!vehicleRequest.isMeaningful()) {
+            throw new AppException(ErrorCode.REQ_IS_NOT_MEANINGFUL);
+        }
 
         if (DataUtils.nonNull(vehicleRequest.getId())) {
             return vehicleRepository.findById(vehicleRequest.getId())
@@ -115,7 +117,11 @@ public class VehicleServiceImpl implements VehicleService {
                 .filter(vehicle -> hasRequiredFeatures(vehicle.getFeatureMask(), vehicleRequest.getFeatureMask()))
                 .filter(vehicle -> !isVehicleBlocked(vehicle, finalRequest))
                 .toList();
-        return evaluateAndSort(satisfiedVehicles, finalRequest);
+        satisfiedVehicles = evaluateAndSort(satisfiedVehicles, finalRequest);
+        if (vehicleRequest.getOffset() != null) {
+            satisfiedVehicles.stream().limit(vehicleRequest.getOffset()).toList();
+        }
+        return satisfiedVehicles;
     }
 
     private List<Vehicle> evaluateAndSort(List<Vehicle> vehicles, VehicleRequestDTO request) {
