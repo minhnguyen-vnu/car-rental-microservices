@@ -1,5 +1,6 @@
 package com.fleetmanagementservice.kernel.mapper;
 
+import com.fleetmanagementservice.core.document.VehicleDocument;
 import com.fleetmanagementservice.core.dto.request.VehicleRequestDTO;
 import com.fleetmanagementservice.core.dto.response.VehicleResponseDTO;
 import com.fleetmanagementservice.core.entity.Vehicle;
@@ -61,6 +62,7 @@ public final class VehicleMapper {
                 .branchId(dto.getBranchId())
                 .turnaroundMinutes(dto.getTurnaroundMinutes())
                 .imageUrl(dto.getImageUrl())
+                .featureMask(dto.getFeatureMask())
                 .build();
     }
 
@@ -69,5 +71,30 @@ public final class VehicleMapper {
         return dtos.stream().filter(Objects::nonNull)
                 .map(VehicleMapper::toEntity)
                 .collect(Collectors.toList());
+    }
+
+    public static VehicleDocument toDocument(Vehicle vehicle) {
+        if (vehicle == null) return null;
+
+        return VehicleDocument.builder()
+                .id(vehicle.getId())
+                .vehicleCode(vehicle.getVehicleCode())
+                .licensePlate(vehicle.getLicensePlate())
+                .brand(vehicle.getBrand())
+                .model(vehicle.getModel())
+                .vehicleType(vehicle.getVehicleType())
+                .seats(vehicle.getSeats())
+                .transmission(vehicle.getTransmission())
+                .fuelType(vehicle.getFuelType())
+                .color(vehicle.getColor())
+                .year(vehicle.getYear())
+                .basePrice(vehicle.getBasePrice())
+                .status(vehicle.getStatus())
+                .branchId(vehicle.getBranchId())
+                .turnaroundMinutes(vehicle.getTurnaroundMinutes())
+                .imageUrl(vehicle.getImageUrl())
+                .createdAt(vehicle.getCreatedAt())
+                .updatedAt(vehicle.getUpdatedAt())
+                .build();
     }
 }

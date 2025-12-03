@@ -5,7 +5,7 @@ import com.fleetmanagementservice.core.entity.Branch;
 
 import java.util.List;
 
-public interface BranchService {
+public interface  BranchService {
     public Branch addBranch(BranchRequestDTO branchRequestDTO);
     public Branch updateBranch(BranchRequestDTO branchRequestDTO);
     public List<Branch> getBranch(BranchRequestDTO branchRequestDTO);

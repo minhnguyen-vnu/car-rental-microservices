@@ -29,6 +29,7 @@ public enum ErrorCode {
     REQ_INVALID_TIME_RANGE(2009, "Invalid time range"),
     REQ_INVALID_DURATION(2010, "Invalid duration value"),
     REQ_INVALID_AMOUNT(2011, "Invalid amount value"),
+    REQ_TIME_RANGE_REQUIRED(2012, "Pickup and Return time required"),
 
     // 3xxx: Vehicle
     VEHICLE_NOT_FOUND(3001, "Vehicle not found"),
@@ -59,6 +60,10 @@ public enum ErrorCode {
     PAYMENT_METHOD_REQUIRED(6009, "Payment method is required"),
     PAYMENT_PROVIDER_REQUIRED(6010, "Payment provider is required"),
     PAYMENT_IDEMPOTENCY_CONFLICT(6011, "Idempotency conflict"),
+
+    AI_GEMINI_CALL_FAILED(7001, "Gemini API call failed"),
+    AI_GEMINI_PARSE_FAILED(7002, "Failed to parse Gemini response"),
+    AI_GEMINI_TIMEOUT(7003, "Gemini API timeout"),
 
     // 9xxx: System
     SYS_UNEXPECTED(9000, "Unexpected error"),

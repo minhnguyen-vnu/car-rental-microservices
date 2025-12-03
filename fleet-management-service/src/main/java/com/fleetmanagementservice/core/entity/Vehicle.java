@@ -47,6 +47,8 @@ public class Vehicle {
     private Integer turnaroundMinutes;
     @Column(name = "image_url")
     private String imageUrl;
+    @Column(name = "feature_mask")
+    private Long featureMask;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

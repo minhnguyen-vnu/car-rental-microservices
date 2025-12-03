@@ -10,4 +10,6 @@ public interface VehicleBlockService {
     public List<VehicleBlock> getVehicleBlock(VehicleBlockRequestDTO request);
     public void saveVehicleBlock(VehicleBlock vehicleBlock);
     public void deleteVehicleBlock(VehicleBlock vehicleBlock);
+    public boolean checkVehicleBlockOverlap(VehicleBlockRequestDTO requestDTO);
+    public List<VehicleBlock> getAllVehicleBlock(VehicleBlockRequestDTO request);
 }

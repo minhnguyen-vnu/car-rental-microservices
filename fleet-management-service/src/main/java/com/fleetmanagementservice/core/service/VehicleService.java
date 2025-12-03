@@ -10,4 +10,5 @@ public interface VehicleService {
     public Vehicle updateVehicle(VehicleRequestDTO vehicleRequest);
     public List<Vehicle> getVehicle(VehicleRequestDTO vehicleRequest);
     public void removeVehicle(VehicleRequestDTO vehicleRequest);
+    void sync();
 }

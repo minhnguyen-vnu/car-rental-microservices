@@ -3,6 +3,7 @@ package com.fleetmanagementservice.ui.restful.impl;
 import com.fleetmanagementservice.core.dto.request.VehicleRequestDTO;
 import com.fleetmanagementservice.core.dto.response.VehicleResponseDTO;
 import com.fleetmanagementservice.core.constant.response.GeneralResponse;
+import com.fleetmanagementservice.core.service.VehicleSearchService;
 import com.fleetmanagementservice.core.service.VehicleService;
 import com.fleetmanagementservice.kernel.mapper.VehicleMapper;
 import com.fleetmanagementservice.ui.restful.VehicleManagementController;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehicleManagementControllerImpl implements VehicleManagementController {
     private final VehicleService vehicleService;
+    private final VehicleSearchService vehicleSearchService;
 
     @Override
     public GeneralResponse<VehicleResponseDTO> addVehicle(VehicleRequestDTO addVehicleRequestDTO) {
@@ -35,5 +37,17 @@ public class VehicleManagementControllerImpl implements VehicleManagementControl
     public GeneralResponse<Void> removeVehicle(VehicleRequestDTO removeVehicleRequestDTO) {
         vehicleService.removeVehicle(removeVehicleRequestDTO);
         return GeneralResponse.ok(null);
+    }
+
+    @Override
+    public GeneralResponse<String> reindexAll() {
+        vehicleSearchService.reindex();
+        return GeneralResponse.ok("Reindex completed");
+    }
+
+    @Override
+    public GeneralResponse<String> sync() {
+        vehicleService.sync();
+        return GeneralResponse.ok("Sync completed");
     }
 }

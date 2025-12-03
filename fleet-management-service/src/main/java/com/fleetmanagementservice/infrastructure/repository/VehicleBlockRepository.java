@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface VehicleBlockRepository extends JpaRepository<VehicleBlock, Integer> {
     Optional<List<VehicleBlock>> findByVehicleIdAndStartTimeLessThanAndEndTimeGreaterThan(Integer vehicleId, LocalDateTime startTimeIsLessThan, LocalDateTime endTimeIsGreaterThan);
     Optional<VehicleBlock> findByRentalId(Integer rentalId);
+    boolean existsByVehicleIdAndStartTimeLessThanAndEndTimeGreaterThan(Integer vehicleId, LocalDateTime startTimeIsLessThan, LocalDateTime endTimeIsGreaterThan);
+    Optional<List<VehicleBlock>> findByStartTimeLessThanAndEndTimeGreaterThan(LocalDateTime startTimeIsLessThan, LocalDateTime endTimeIsGreaterThan);
 }

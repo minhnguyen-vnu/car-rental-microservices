@@ -17,5 +17,8 @@ public interface VehicleManagementController {
     public GeneralResponse<List<VehicleResponseDTO>> getVehicleDetail(@RequestBody VehicleRequestDTO vehicleDetailRequestDTO);
     @DeleteMapping("/remove")
     public GeneralResponse<Void> removeVehicle(@RequestBody VehicleRequestDTO removeVehicleRequestDTO);
-
+    @PostMapping("/reindex")
+    public GeneralResponse<String> reindexAll();
+    @PostMapping("/sync")
+    public GeneralResponse<String> sync();
 }

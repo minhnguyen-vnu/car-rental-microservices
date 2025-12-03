@@ -19,11 +19,15 @@ public class VehicleBlockServiceImpl implements VehicleBlockService {
 
     @Override
     public List<VehicleBlock> getVehicleBlock(VehicleBlockRequestDTO request) {
-        if (DataUtils.isNull(request.getVehicleId())
-                || DataUtils.isNull(request.getStartTime())
-                || DataUtils.isNull(request.getEndTime())) {
+        if (DataUtils.isNull(request.getVehicleId())) {
             throw new AppException(ErrorCode.REQ_MISSING_FIELD);
         }
+
+        if (DataUtils.isNull(request.getStartTime())
+                || DataUtils.isNull(request.getEndTime())) {
+            throw new AppException(ErrorCode.REQ_TIME_RANGE_REQUIRED);
+        }
+
         return vehicleBlockRepository.findByVehicleIdAndStartTimeLessThanAndEndTimeGreaterThan(
                 request.getVehicleId(), request.getEndTime(), request.getStartTime()
         ).orElse(List.of());
@@ -37,5 +41,30 @@ public class VehicleBlockServiceImpl implements VehicleBlockService {
     @Override
     public void deleteVehicleBlock(VehicleBlock vehicleBlock) {
         vehicleBlockRepository.delete(vehicleBlock);
+    }
+
+    @Override
+    public boolean checkVehicleBlockOverlap(VehicleBlockRequestDTO request) {
+        if (DataUtils.isNull(request.getVehicleId())
+                || DataUtils.isNull(request.getStartTime())
+                || DataUtils.isNull(request.getEndTime())) {
+            throw new AppException(ErrorCode.REQ_MISSING_FIELD);
+        }
+
+        return vehicleBlockRepository.existsByVehicleIdAndStartTimeLessThanAndEndTimeGreaterThan(
+                request.getVehicleId(), request.getEndTime(), request.getStartTime()
+        );
+    }
+
+    @Override
+    public List<VehicleBlock> getAllVehicleBlock(VehicleBlockRequestDTO request) {
+        if (DataUtils.isNull(request.getStartTime())
+                || DataUtils.isNull(request.getEndTime())) {
+            throw new AppException(ErrorCode.REQ_TIME_RANGE_REQUIRED);
+        }
+
+        return vehicleBlockRepository.findByStartTimeLessThanAndEndTimeGreaterThan(
+                request.getEndTime(), request.getStartTime()
+        ).orElse(List.of());
     }
 }
