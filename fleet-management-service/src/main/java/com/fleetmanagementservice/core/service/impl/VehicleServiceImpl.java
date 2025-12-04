@@ -92,10 +92,6 @@ public class VehicleServiceImpl implements VehicleService {
             throw new AppException(ErrorCode.REQ_INVALID_TIME_RANGE);
         }
 
-        if (!vehicleRequest.isMeaningful()) {
-            throw new AppException(ErrorCode.REQ_IS_NOT_MEANINGFUL);
-        }
-
         if (DataUtils.nonNull(vehicleRequest.getId())) {
             return vehicleRepository.findById(vehicleRequest.getId())
                     .filter(vehicle -> !isVehicleBlocked(vehicle, vehicleRequest))
@@ -108,18 +104,23 @@ public class VehicleServiceImpl implements VehicleService {
             extractedRequest = aiParserService.parseVehicleQuery(vehicleRequest.getFreeText());
         }
         final VehicleRequestDTO finalRequest = mergeRequest(extractedRequest, vehicleRequest);
+
+        if (!finalRequest.getIsMeaningful()) {
+            throw new AppException(ErrorCode.REQ_IS_NOT_MEANINGFUL);
+        }
+
         Specification<Vehicle> spec = buildSpecification(finalRequest, null);
         List<Vehicle> vehicleList = vehicleRepository.findAll(spec);
-        if (DataUtils.isNull(vehicleRequest.getFeatureMask())) {
-            vehicleRequest.setFeatureMask(0L);
+        if (DataUtils.isNull(finalRequest.getFeatureMask())) {
+            finalRequest.setFeatureMask(0L);
         }
         List<Vehicle> satisfiedVehicles = vehicleList.stream()
-                .filter(vehicle -> hasRequiredFeatures(vehicle.getFeatureMask(), vehicleRequest.getFeatureMask()))
+                .filter(vehicle -> hasRequiredFeatures(vehicle.getFeatureMask(), finalRequest.getFeatureMask()))
                 .filter(vehicle -> !isVehicleBlocked(vehicle, finalRequest))
                 .toList();
         satisfiedVehicles = evaluateAndSort(satisfiedVehicles, finalRequest);
-        if (vehicleRequest.getOffset() != null) {
-            satisfiedVehicles.stream().limit(vehicleRequest.getOffset()).toList();
+        if (finalRequest.getOffset() != null) {
+            satisfiedVehicles = satisfiedVehicles.stream().limit(finalRequest.getOffset()).toList();
         }
         return satisfiedVehicles;
     }
@@ -219,6 +220,12 @@ public class VehicleServiceImpl implements VehicleService {
         merged.setBranchId(DataUtils.nonNull(userRequest.getBranchId()) ? userRequest.getBranchId() : extractedRequest.getBranchId());
         merged.setTurnaroundMinutes(DataUtils.nonNull(userRequest.getTurnaroundMinutes()) ? userRequest.getTurnaroundMinutes() : extractedRequest.getTurnaroundMinutes());
         merged.setImageUrl(DataUtils.nonNull(userRequest.getImageUrl()) ? userRequest.getImageUrl() : extractedRequest.getImageUrl());
+        merged.setIsMeaningful(DataUtils.nonNull(userRequest.getIsMeaningful()) ? userRequest.getIsMeaningful() : extractedRequest.getIsMeaningful());
+        merged.setFeatureMask(DataUtils.nonNull(userRequest.getFeatureMask()) ? userRequest.getFeatureMask() : extractedRequest.getFeatureMask());
+        merged.setPickupTime(userRequest.getPickupTime());
+        merged.setReturnTime(userRequest.getReturnTime());
+
+        merged.setOffset(extractedRequest.getOffset());
         merged.setFreeText(DataUtils.nonNull(userRequest.getFreeText()) ? userRequest.getFreeText() : extractedRequest.getFreeText());
 
         return merged;
@@ -261,7 +268,7 @@ public class VehicleServiceImpl implements VehicleService {
                 ps.add(cb.equal(root.get("year"), req.getYear()));
             }
             if (DataUtils.nonNull(req.getBasePrice())) {
-                ps.add(cb.greaterThanOrEqualTo(root.get("basePrice"), req.getBasePrice()));
+                ps.add(cb.lessThanOrEqualTo(root.get("basePrice"), req.getBasePrice()));
             }
             if (!DataUtils.isBlank(req.getStatus())) {
                 ps.add(cb.equal(root.get("status"), req.getStatus()));
@@ -276,7 +283,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     private boolean isVehicleBlocked(Vehicle vehicle, VehicleRequestDTO request) {
         VehicleBlockRequestDTO blockCheck = VehicleBlockRequestDTO.builder()
-                .id(vehicle.getId())
+                .vehicleId(vehicle.getId())
                 .startTime(request.getPickupTime())
                 .endTime(request.getReturnTime())
                 .build();

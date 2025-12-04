@@ -34,7 +34,7 @@ public class VehicleRequestDTO {
     private String imageUrl;
     private Long featureMask;
     private Integer offset;
-    private boolean isMeaningful;
+    private Boolean isMeaningful;
 
     private LocalDateTime pickupTime;
     private LocalDateTime returnTime;
