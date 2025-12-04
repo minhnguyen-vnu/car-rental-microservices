@@ -39,5 +39,8 @@ public class VehicleRequestDTO {
     private LocalDateTime pickupTime;
     private LocalDateTime returnTime;
 
+    private Integer page;
+    private Integer size;
+
     private String freeText;
 }
